@@ -1,0 +1,103 @@
+#include <Servo.h>
+
+const int s0 = 8;
+const int s1 = 9;
+const int s2 = 10;
+const int s3 = 11;
+const int out = 12;
+
+Servo myservo1;
+Servo myservo2;
+
+// Variables
+int red = 0;
+int green = 0;
+int blue = 0;
+
+void setup() {
+  myservo1.attach(7);
+  myservo2.attach(13);
+  Serial.begin(9600);
+  pinMode(s0, OUTPUT);
+  pinMode(s1, OUTPUT);
+  pinMode(s2, OUTPUT);
+  pinMode(s3, OUTPUT);
+  pinMode(out, INPUT);
+  digitalWrite(s0, HIGH);
+  digitalWrite(s1, HIGH);
+}
+
+void loop() {
+  int pos;
+
+  // Mueve el servo de derecha a izquierda
+  for (pos = 0; pos <= 120; pos++) {
+    myservo1.write(pos);  // Envía la posición al servo
+    delay(10);  // Pequeña pausa para el movimiento suave
+  }
+  
+  delay(4000);  // Espera 2 segundos
+  
+  for (pos = 120; pos >= 50; pos--) {
+    myservo1.write(pos);  // Envía la posición al servo
+    delay(50);  // Pequeña pausa para el movimiento suave
+  }
+  
+  // Escanea el color cuando el servo está en la posición 50
+  int R = getRojo();
+  delay(50);
+  int V = getVerde();
+  delay(50);
+  int A = getAzul();
+  delay(50);
+  if ((R >= 9 && R <= 11) && (V >= 12 && V <= 14) && (A >= 9 && A <= 12)) {
+    Serial.print("  EL COLOR ES AZUL ");
+    myservo2.write(0);
+  } else if ((R >= 8 && R <= 10) && (V >= 13 && V <= 17) && (A >= 12 && A <= 15)) {
+    Serial.print("  EL COLOR ES Rojo");
+    myservo2.write(30);
+  } else if ((R >= 8 && R <= 9) && (V >= 11 && V <= 12) && (A >= 13 && A <= 14)) {
+    Serial.print("  EL COLOR ES Amarillo");
+  myservo2.write(60);
+} else {
+  Serial.print("  EL COLOR NO HA SIDO REGISTRADO");
+}
+Serial.println(" ");
+
+
+  delay(5000); // Espera adicional
+
+  // Regresa el servo a su posición original
+  for (pos = 50; pos >= 0; pos--) {
+    myservo1.write(pos);  // Envía la posición al servo
+    delay(50);  
+  }
+
+  // Analiza el color y muestra el resultado por serial
+
+
+}
+
+int getRojo() {
+  // leer color rojo
+  digitalWrite(s2, LOW);
+  digitalWrite(s3, LOW);
+  int ROJO = pulseIn(out, LOW);
+  return ROJO;
+}
+
+int getAzul() {
+  // leer color azul
+  digitalWrite(s2, LOW);
+  digitalWrite(s3, HIGH);
+  int AZUL = pulseIn(out, LOW);
+  return AZUL;
+}
+
+int getVerde() {
+  // leer color verde
+  digitalWrite(s2, HIGH);
+  digitalWrite(s3, HIGH);
+  int VERDE = pulseIn(out, LOW);
+  return VERDE;
+}
